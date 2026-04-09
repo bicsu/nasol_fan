@@ -63,7 +63,11 @@ export default function ProfileScreen() {
 
   const formatDate = (dateStr: string) => {
     const d = new Date(dateStr);
-    return `${d.getMonth() + 1}/${d.getDate()} ${d.getHours()}:${d.getMinutes().toString().padStart(2, '0')}`;
+    const MM = String(d.getMonth() + 1).padStart(2, '0');
+    const DD = String(d.getDate()).padStart(2, '0');
+    const HH = String(d.getHours()).padStart(2, '0');
+    const mm = String(d.getMinutes()).padStart(2, '0');
+    return `${MM}/${DD} ${HH}:${mm}`;
   };
 
   const reasonLabels: Record<string, string> = {

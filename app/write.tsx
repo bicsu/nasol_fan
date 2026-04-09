@@ -16,6 +16,7 @@ import { useAuthStore } from '../stores/authStore';
 export default function WriteScreen() {
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
+  const refreshUser = useAuthStore((s) => s.refreshUser);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [loading, setLoading] = useState(false);
@@ -44,17 +45,13 @@ export default function WriteScreen() {
       return;
     }
 
-    // Award points
-    await supabase.from('point_history').insert({
-      user_id: user.id,
-      amount: 10,
-      reason: 'post',
+    // 포인트 지급 — RPC로 원자적 처리 (race condition · 이중 지급 방지)
+    await supabase.rpc('award_points', {
+      p_user_id: user.id,
+      p_amount: 10,
+      p_reason: 'post',
     });
-
-    await supabase
-      .from('users')
-      .update({ total_points: (user.total_points || 0) + 10 })
-      .eq('id', user.id);
+    await refreshUser();
 
     setLoading(false);
     router.back();

@@ -20,6 +20,8 @@ export default function LoginScreen() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const NICKNAME_REGEX = /^[가-힣a-zA-Z0-9_]+$/;
+
   const handleSubmit = async () => {
     const trimmed = nickname.trim();
     if (!trimmed) {
@@ -28,6 +30,10 @@ export default function LoginScreen() {
     }
     if (trimmed.length < 2 || trimmed.length > 10) {
       Alert.alert('알림', '닉네임은 2~10자로 입력해주세요.');
+      return;
+    }
+    if (!NICKNAME_REGEX.test(trimmed)) {
+      Alert.alert('알림', '닉네임은 한글, 영문, 숫자, _만 사용 가능합니다.');
       return;
     }
 

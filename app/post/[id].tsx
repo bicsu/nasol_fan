@@ -17,12 +17,24 @@ import { supabase } from '../../lib/supabase';
 import { useAuthStore } from '../../stores/authStore';
 import type { Post, Comment } from '../../lib/database.types';
 
+const formatDate = (dateStr: string) => {
+  const d = new Date(dateStr);
+  const YYYY = d.getFullYear();
+  const MM = String(d.getMonth() + 1).padStart(2, '0');
+  const DD = String(d.getDate()).padStart(2, '0');
+  const HH = String(d.getHours()).padStart(2, '0');
+  const mm = String(d.getMinutes()).padStart(2, '0');
+  return `${YYYY}.${MM}.${DD} ${HH}:${mm}`;
+};
+
 export default function PostDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const user = useAuthStore((s) => s.user);
+  const refreshUser = useAuthStore((s) => s.refreshUser);
   const [post, setPost] = useState<Post | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [commentInput, setCommentInput] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -62,10 +74,10 @@ export default function PostDetailScreen() {
   };
 
   const handleComment = async () => {
-    if (!commentInput.trim() || !user || !id) return;
+    if (!commentInput.trim() || !user || !id || submitting) return;
 
+    setSubmitting(true);
     const content = commentInput.trim();
-    setCommentInput('');
 
     const { data, error } = await supabase
       .from('comments')
@@ -79,27 +91,22 @@ export default function PostDetailScreen() {
 
     if (error) {
       Alert.alert('오류', error.message);
+      setSubmitting(false);
       return;
     }
 
-    if (data) setComments((prev) => [...prev, data as any]);
+    setCommentInput('');
+    if (data) setComments((prev) => [...prev, data as Comment]);
 
-    // Award points
-    await supabase.from('point_history').insert({
-      user_id: user.id,
-      amount: 5,
-      reason: 'comment',
+    // 포인트 지급 — RPC로 원자적 처리
+    await supabase.rpc('award_points', {
+      p_user_id: user.id,
+      p_amount: 5,
+      p_reason: 'comment',
     });
+    await refreshUser();
 
-    await supabase
-      .from('users')
-      .update({ total_points: (user.total_points || 0) + 5 })
-      .eq('id', user.id);
-  };
-
-  const formatDate = (dateStr: string) => {
-    const d = new Date(dateStr);
-    return `${d.getFullYear()}.${d.getMonth() + 1}.${d.getDate()} ${d.getHours()}:${d.getMinutes().toString().padStart(2, '0')}`;
+    setSubmitting(false);
   };
 
   if (!post) {
@@ -158,9 +165,9 @@ export default function PostDetailScreen() {
           maxLength={500}
         />
         <TouchableOpacity
-          style={[styles.sendButton, !commentInput.trim() && styles.sendDisabled]}
+          style={[styles.sendButton, (!commentInput.trim() || submitting) && styles.sendDisabled]}
           onPress={handleComment}
-          disabled={!commentInput.trim()}
+          disabled={!commentInput.trim() || submitting}
         >
           <Text style={{ fontSize: 16, color: colors.white }}>➤</Text>
         </TouchableOpacity>

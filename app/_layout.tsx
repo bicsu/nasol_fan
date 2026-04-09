@@ -3,6 +3,7 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useAuthStore } from '../stores/authStore';
 import { colors } from '../lib/theme';
+import { ErrorBoundary } from '../components/ErrorBoundary';
 
 export default function RootLayout() {
   const loadSession = useAuthStore((s) => s.loadSession);
@@ -12,7 +13,7 @@ export default function RootLayout() {
   }, []);
 
   return (
-    <>
+    <ErrorBoundary>
       <StatusBar style="dark" />
       <Stack
         screenOptions={{
@@ -43,7 +44,11 @@ export default function RootLayout() {
           name="write"
           options={{ title: '글쓰기', presentation: 'modal' }}
         />
+        <Stack.Screen
+          name="terms"
+          options={{ title: '서비스 이용약관' }}
+        />
       </Stack>
-    </>
+    </ErrorBoundary>
   );
 }

@@ -49,22 +49,18 @@ export default function VoteScreen() {
         }
       }
 
-      // Get vote counts
-      if (items) {
-        const counts: Record<string, Record<string, number>> = {};
-        for (const item of items) {
-          const { data: responses } = await supabase
-            .from('vote_responses')
-            .select('selected_option_id')
-            .eq('vote_item_id', item.id);
+      // Get vote counts — single query, client-side grouping (N+1 제거)
+      if (items && items.length > 0) {
+        const { data: allResponses } = await supabase
+          .from('vote_responses')
+          .select('vote_item_id, selected_option_id')
+          .in('vote_item_id', items.map((i) => i.id));
 
-          if (responses) {
-            const itemCounts: Record<string, number> = {};
-            responses.forEach((r: any) => {
-              itemCounts[r.selected_option_id] = (itemCounts[r.selected_option_id] || 0) + 1;
-            });
-            counts[item.id] = itemCounts;
-          }
+        const counts: Record<string, Record<string, number>> = {};
+        for (const r of allResponses ?? []) {
+          counts[r.vote_item_id] ??= {};
+          counts[r.vote_item_id][r.selected_option_id] =
+            (counts[r.vote_item_id][r.selected_option_id] ?? 0) + 1;
         }
         setVoteCounts(counts);
       }
@@ -76,11 +72,19 @@ export default function VoteScreen() {
   const handleVote = async (voteItemId: string, optionId: string) => {
     if (!user || myVotes[voteItemId]) return;
 
-    await supabase.from('vote_responses').insert({
+    const { error } = await supabase.from('vote_responses').insert({
       vote_item_id: voteItemId,
       user_id: user.id,
       selected_option_id: optionId,
     });
+
+    if (error) {
+      // 23505 = unique_violation (DB UNIQUE constraint)
+      if (error.code !== '23505') {
+        console.error('vote insert error:', error);
+      }
+      return;
+    }
 
     setMyVotes((prev) => ({ ...prev, [voteItemId]: optionId }));
     setVoteCounts((prev) => ({

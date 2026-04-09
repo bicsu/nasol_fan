@@ -34,19 +34,9 @@ export default function ChatScreen() {
   useEffect(() => {
     if (!currentEpisode) return;
 
-    const loadMessages = async () => {
-      const { data } = await supabase
-        .from('chat_messages')
-        .select('*, user:users(nickname, avatar_color)')
-        .eq('episode_id', currentEpisode.id)
-        .order('created_at', { ascending: true })
-        .limit(100);
+    let active = true;
 
-      if (data) setMessages(data as any);
-    };
-
-    loadMessages();
-
+    // 구독 먼저 연결 → SUBSCRIBED 상태 확인 후 히스토리 로드 (메시지 누락 방지)
     const channel = supabase
       .channel(`chat:${currentEpisode.id}`)
       .on(
@@ -58,20 +48,35 @@ export default function ChatScreen() {
           filter: `episode_id=eq.${currentEpisode.id}`,
         },
         async (payload) => {
+          if (!active) return;
           const { data: newMsg } = await supabase
             .from('chat_messages')
             .select('*, user:users(nickname, avatar_color)')
             .eq('id', payload.new.id)
-            .single();
+            .maybeSingle();
 
-          if (newMsg) {
-            setMessages((prev) => [...prev, newMsg as any]);
+          if (newMsg && active) {
+            setMessages((prev) =>
+              prev.some((m) => m.id === newMsg.id) ? prev : [...prev, newMsg as ChatMessage]
+            );
           }
         }
       )
-      .subscribe();
+      .subscribe(async (status) => {
+        if (status === 'SUBSCRIBED' && active) {
+          const { data } = await supabase
+            .from('chat_messages')
+            .select('*, user:users(nickname, avatar_color)')
+            .eq('episode_id', currentEpisode.id)
+            .order('created_at', { ascending: true })
+            .limit(100);
+
+          if (active && data) setMessages(data as ChatMessage[]);
+        }
+      });
 
     return () => {
+      active = false;
       supabase.removeChannel(channel);
     };
   }, [currentEpisode?.id]);
@@ -82,11 +87,16 @@ export default function ChatScreen() {
     const content = input.trim();
     setInput('');
 
-    await supabase.from('chat_messages').insert({
+    const { error } = await supabase.from('chat_messages').insert({
       episode_id: currentEpisode.id,
       user_id: user.id,
       content,
     });
+
+    if (error) {
+      console.error('sendMessage error:', error);
+      setInput(content); // 실패 시 입력 복원
+    }
   };
 
   const renderMessage = ({ item }: { item: ChatMessage }) => {

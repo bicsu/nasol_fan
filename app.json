@@ -8,7 +8,7 @@
     "userInterfaceStyle": "light",
     "scheme": "nasolfans",
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/splash-image.png",
       "resizeMode": "contain",
       "backgroundColor": "#D4537E"
     },

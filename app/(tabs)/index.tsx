@@ -79,8 +79,8 @@ export default function HomeScreen() {
   };
 
   const loadData = useCallback(async () => {
-    await Promise.all([fetchCurrentEpisode(), fetchNextEpisode(), fetchPosts()]);
-  }, []);
+    await Promise.allSettled([fetchCurrentEpisode(), fetchNextEpisode(), fetchPosts()]);
+  }, [fetchCurrentEpisode, fetchNextEpisode]);
 
   useEffect(() => {
     loadData();

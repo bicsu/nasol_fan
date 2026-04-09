@@ -1,15 +1,17 @@
 import { create } from 'zustand';
+import type { Session } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 import type { User } from '../lib/database.types';
 
 type AuthState = {
   user: User | null;
-  session: any | null;
+  session: Session | null;
   loading: boolean;
   signUp: (nickname: string) => Promise<{ error?: string }>;
   signIn: (nickname: string) => Promise<{ error?: string }>;
   signOut: () => Promise<void>;
   loadSession: () => Promise<void>;
+  refreshUser: () => Promise<void>;
 };
 
 export const useAuthStore = create<AuthState>((set, get) => ({
@@ -19,7 +21,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   signUp: async (nickname: string) => {
     const email = `${nickname.toLowerCase().replace(/[^a-z0-9]/g, '')}@nasolfans.app`;
-    const password = `nasol_${nickname}_${Date.now()}`;
+    // TODO(Phase 2): Toss 로그인으로 교체 시 이 임시 비밀번호 방식 제거
+    const password = `nasol_${Math.random().toString(36).slice(2)}_${Date.now()}`;
 
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
@@ -51,17 +54,30 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     return {};
   },
 
+  // TODO(Phase 2): Toss 로그인으로 교체. 현재는 닉네임 조회만으로 로그인 (임시)
   signIn: async (nickname: string) => {
-    const { data: profile } = await supabase
+    const { data: profile, error } = await supabase
       .from('users')
       .select('*')
       .eq('nickname', nickname)
-      .single();
+      .maybeSingle();
 
+    if (error) return { error: error.message };
     if (!profile) return { error: '존재하지 않는 닉네임입니다.' };
 
     set({ user: profile });
     return {};
+  },
+
+  refreshUser: async () => {
+    const { user } = useAuthStore.getState();
+    if (!user) return;
+    const { data } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', user.id)
+      .maybeSingle();
+    if (data) set({ user: data });
   },
 
   signOut: async () => {
@@ -77,7 +93,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         .from('users')
         .select('*')
         .eq('id', session.user.id)
-        .single();
+        .maybeSingle();
 
       set({ user: profile, session, loading: false });
     } else {

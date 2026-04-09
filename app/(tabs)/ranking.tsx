@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useState, useCallback } from 'react';
 import { View, Text, StyleSheet, FlatList } from 'react-native';
+import { useFocusEffect } from 'expo-router';
 
 import { colors, fontSize, fontWeight } from '../../lib/theme';
 import { supabase } from '../../lib/supabase';
@@ -29,25 +30,27 @@ export default function RankingScreen() {
   const [rankings, setRankings] = useState<User[]>([]);
   const [myRank, setMyRank] = useState<number | null>(null);
 
-  useEffect(() => {
-    const load = async () => {
-      const { data } = await supabase
-        .from('users')
-        .select('*')
-        .order('total_points', { ascending: false })
-        .limit(100);
+  useFocusEffect(
+    useCallback(() => {
+      const load = async () => {
+        const { data } = await supabase
+          .from('users')
+          .select('id, nickname, avatar_color, total_points, badge_level')
+          .order('total_points', { ascending: false })
+          .limit(100);
 
-      if (data) {
-        setRankings(data as User[]);
-        if (currentUser) {
-          const idx = data.findIndex((u: any) => u.id === currentUser.id);
-          setMyRank(idx >= 0 ? idx + 1 : null);
+        if (data) {
+          setRankings(data as User[]);
+          if (currentUser) {
+            const idx = data.findIndex((u) => u.id === currentUser.id);
+            setMyRank(idx >= 0 ? idx + 1 : null);
+          }
         }
-      }
-    };
+      };
 
-    load();
-  }, [currentUser?.id]);
+      load();
+    }, [currentUser?.id])
+  );
 
   const renderItem = ({ item, index }: { item: User; index: number }) => {
     const rank = index + 1;

@@ -61,12 +61,18 @@ module.exports = async function handler(req, res) {
     if (!tossUserKey) {
       return res.status(502).json({ error: 'toss_user_key_missing' });
     }
-    const nickname = info.nickname || `팬_${String(tossUserKey).slice(-6)}`;
-    const avatarColor = info.avatarColor || '#D4537E';
+    const realName = info.user_name || null;
+    const realEmail = info.user_email || null;
+    const gender = info.user_gender || null;
+    const birthday = info.user_birthday || null;
+    // 닉네임: 이름 있으면 사용, 없으면 팬_XXXXXX
+    const nickname = realName || `팬_${String(tossUserKey).slice(-6)}`;
+    const avatarColor = '#D4537E';
 
     // 3) Supabase Auth 유저 생성 or 기존 조회
     const supabase = getSupabaseAdmin();
-    const email = `${tossUserKey}@nasolfans.app`;
+    // 실제 이메일이 있으면 사용, 없으면 가상 이메일 (토스 유저키 기반)
+    const email = realEmail || `${tossUserKey}@nasolfans.app`;
 
     let authUserId;
     let existing = null;
@@ -88,6 +94,9 @@ module.exports = async function handler(req, res) {
           user_metadata: {
             toss_user_key: tossUserKey,
             nickname,
+            real_name: realName,
+            gender,
+            birthday,
             referrer: referrer || null,
           },
         });

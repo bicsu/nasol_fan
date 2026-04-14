@@ -125,10 +125,6 @@ export default function LoginScreen() {
           <TouchableOpacity onPress={() => router.push('/terms')}>
             <Text style={styles.linkText}>서비스 이용약관</Text>
           </TouchableOpacity>
-          <Text style={styles.linkDivider}>·</Text>
-          <TouchableOpacity onPress={() => router.push('/terms')}>
-            <Text style={styles.linkText}>개인정보처리방침</Text>
-          </TouchableOpacity>
         </View>
       </View>
     </View>

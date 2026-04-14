@@ -69,6 +69,8 @@ export default function HomeScreen() {
   );
 
   const fetchPosts = async () => {
+    // NOTE(007_users_public_view): 타인 작성자 프로필 조인은 공개 뷰 users_public 사용 권장.
+    // PostgREST 임베드 관계 설정 후 users → users_public 으로 교체 예정.
     const { data } = await supabase
       .from('posts')
       .select('*, user:users(nickname, avatar_color)')
@@ -169,6 +171,13 @@ export default function HomeScreen() {
             </TouchableOpacity>
           ))
         )}
+      </View>
+
+      {/* 서비스 이용약관 */}
+      <View style={styles.footer}>
+        <TouchableOpacity onPress={() => router.push('/terms')}>
+          <Text style={styles.footerLink}>서비스 이용약관</Text>
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );
@@ -299,5 +308,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
+  },
+  footer: {
+    alignItems: 'center',
+    paddingVertical: 20,
+    paddingBottom: 40,
+  },
+  footerLink: {
+    fontSize: fontSize.meta,
+    color: colors.textSecondary,
+    textDecorationLine: 'underline',
   },
 });

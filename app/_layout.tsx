@@ -48,6 +48,14 @@ export default function RootLayout() {
           name="terms"
           options={{ title: '서비스 이용약관' }}
         />
+        <Stack.Screen
+          name="consent"
+          options={{
+            title: '약관 동의',
+            headerBackVisible: false,
+            gestureEnabled: false,
+          }}
+        />
       </Stack>
     </ErrorBoundary>
   );

@@ -55,6 +55,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   // TODO(Phase 2): Toss 로그인으로 교체. 현재는 닉네임 조회만으로 로그인 (임시)
+  // NOTE(007_users_public_view): users 테이블 SELECT 는 본인 행만 허용되므로
+  // 닉네임 기반 타인 조회는 RLS 로 막힘. Phase 2 전환 전 임시 동작을 위해
+  // users_public 뷰에서 nickname 으로 id 를 얻고 본인 세션 수립은 백엔드에서
+  // service_role 로 수행하는 방식으로 교체 예정.
   signIn: async (nickname: string) => {
     const { data: profile, error } = await supabase
       .from('users')

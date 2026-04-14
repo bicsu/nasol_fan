@@ -20,6 +20,8 @@ export default function EpisodeDetailScreen() {
     const load = async () => {
       const [episodeRes, postsRes, votesRes, chatRes] = await Promise.all([
         supabase.from('episodes').select('*').eq('id', id).single(),
+        // NOTE(007_users_public_view): 타인 프로필은 users_public 뷰 사용이 원칙.
+        // PostgREST 임베드 관계 힌트 추가 후 users → users_public 으로 교체 예정.
         supabase
           .from('posts')
           .select('*, user:users(nickname)')

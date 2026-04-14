@@ -113,7 +113,7 @@ export default function VoteScreen() {
           (a, b) => a + b,
           0
         );
-        const hasVoted = !!myVotes[item.id];
+        const hasVoted = !!myVotes[item.id] || !user;
         const isResolved = !!item.correct_option_id;
 
         return (
@@ -184,6 +184,12 @@ export default function VoteScreen() {
           <Text style={styles.emptySubText}>아직 투표 항목이 없어요</Text>
         </View>
       )}
+
+      {!user && voteItems.length > 0 && (
+        <View style={styles.loginNotice}>
+          <Text style={styles.emptySubText}>🔐 토스 로그인 연동 후 직접 투표할 수 있어요</Text>
+        </View>
+      )}
     </ScrollView>
   );
 }
@@ -216,6 +222,14 @@ const styles = StyleSheet.create({
   emptyInline: {
     alignItems: 'center',
     paddingTop: 40,
+  },
+  loginNotice: {
+    alignItems: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    backgroundColor: colors.card,
+    borderRadius: 12,
+    marginTop: 4,
   },
   voteCard: {
     backgroundColor: colors.card,

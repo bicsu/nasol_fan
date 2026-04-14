@@ -33,8 +33,10 @@ export default function RankingScreen() {
   useFocusEffect(
     useCallback(() => {
       const load = async () => {
+        // NOTE(007_users_public_view): 타인 프로필 조회는 users_public 뷰를 사용.
+        // users 테이블 직접 SELECT 는 RLS 에 의해 본인 행만 반환됨.
         const { data } = await supabase
-          .from('users')
+          .from('users_public')
           .select('id, nickname, avatar_color, total_points, badge_level')
           .order('total_points', { ascending: false })
           .limit(100);

@@ -1,6 +1,13 @@
 {
   "outputDirectory": "dist",
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/auth/toss/disconnect", "destination": "/api/auth/disconnect" },
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
+  ],
+  "crons": [
+    {
+      "path": "/api/cron/episode-status",
+      "schedule": "* * * * *"
+    }
   ]
 }

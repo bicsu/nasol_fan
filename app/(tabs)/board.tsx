@@ -21,6 +21,8 @@ export default function BoardScreen() {
   const [refreshing, setRefreshing] = useState(false);
 
   const fetchPosts = useCallback(async () => {
+    // NOTE(007_users_public_view): 타인 작성자 프로필은 공개 뷰 users_public 사용이 원칙.
+    // PostgREST 임베드 조인 관계 설정 후 users → users_public 으로 교체 예정.
     const { data } = await supabase
       .from('posts')
       .select('*, user:users(nickname, avatar_color)')
@@ -95,18 +97,14 @@ export default function BoardScreen() {
         }
       />
 
-      <TouchableOpacity
-        style={styles.fab}
-        onPress={() => {
-          if (!user) {
-            router.push('/login');
-          } else {
-            router.push('/write');
-          }
-        }}
-      >
-        <Text style={{ fontSize: 24, color: colors.white }}>+</Text>
-      </TouchableOpacity>
+      {user && (
+        <TouchableOpacity
+          style={styles.fab}
+          onPress={() => router.push('/write')}
+        >
+          <Text style={{ fontSize: 24, color: colors.white }}>+</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 }

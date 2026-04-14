@@ -54,3 +54,5 @@ tmp/
 # EAS
 .eas/
 .vercel
+
+server/certs/*

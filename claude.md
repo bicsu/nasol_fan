@@ -2,7 +2,7 @@
 
 > 나는 솔로 팬들의 실시간 채팅 · 토론 · 예측 커뮤니티 앱
 > **앱인토스(토스 미니앱) 출시** · React Native (Expo) + Supabase + 자체 백엔드
-
+> 애매하면 옵션을 주고 되물어라 나에게
 ---
 
 ## 1. 프로젝트 개요
@@ -422,3 +422,54 @@ air_end + 1시간 → chat_status = 'closed' (읽기 전용 아카이브)
 - 푸시 알림: https://developers-apps-in-toss.toss.im/push/develop.html
 - FAQ: https://developers-apps-in-toss.toss.im/faq.html
 - 출시 체크리스트: .claude/apps-in-toss-checklist.md
+
+---
+
+## 하네스: 나솔팬즈 개발 에이전트 팀
+
+**목표:** 나솔팬즈 기능 개발(프론트·백엔드·DB)과 앱인토스 출시 준비를 에이전트 팀으로 처리
+
+**에이전트 팀:**
+| 에이전트 | 역할 |
+|---------|------|
+| frontend-dev | Expo/React Native 화면·컴포넌트 개발, Supabase 클라이언트 연동 |
+| backend-dev | Node.js + mTLS 백엔드 서버, 토스 로그인·푸시 API 연동 |
+| db-dev | Supabase 스키마·마이그레이션·RLS 정책·Edge Function |
+| qa-review | 통합 QA, 앱인토스 컴플라이언스 검토, 경계면 버그 탐지 |
+
+**스킬:**
+| 스킬 | 용도 | 사용 에이전트 |
+|------|------|-------------|
+| nasol-build | 크로스 레이어 기능 개발 오케스트레이터 | 리더(Claude) |
+| expo-screen | Expo Router 화면·RN 컴포넌트 패턴 | frontend-dev |
+| toss-integration | mTLS·토스 로그인·푸시 API 구현 패턴 | backend-dev |
+| supabase-ops | 마이그레이션·RLS·Realtime·Edge Function | db-dev |
+| appintoss-qa | 출시 체크리스트·통합 정합성 검증 | qa-review |
+
+**실행 규칙:**
+- 프론트·백엔드·DB에 걸친 기능 개발 요청 시 `nasol-build` 스킬로 에이전트 팀 실행
+- 단일 레이어 작업(화면만, 스키마만 등)은 해당 스킬을 직접 사용해도 무방
+- 앱인토스 출시 점검 요청 시 `appintoss-qa` 스킬 사용
+- 모든 에이전트는 `model: "opus"` 사용
+- 중간 산출물: `_workspace/` 디렉토리 (보존)
+
+**디렉토리 구조:**
+```
+.claude/
+├── agents/
+│   ├── frontend-dev.md
+│   ├── backend-dev.md
+│   ├── db-dev.md
+│   └── qa-review.md
+└── skills/
+    ├── nasol-build/SKILL.md       # 오케스트레이터
+    ├── expo-screen/SKILL.md
+    ├── toss-integration/SKILL.md
+    ├── supabase-ops/SKILL.md
+    └── appintoss-qa/SKILL.md
+```
+
+**변경 이력:**
+| 날짜 | 변경 내용 | 대상 | 사유 |
+|------|----------|------|------|
+| 2026-04-09 | 초기 구성 | 전체 | 나솔팬즈 Phase 2 앱인토스 연동 준비 |

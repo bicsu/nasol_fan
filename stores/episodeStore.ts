@@ -21,10 +21,11 @@ export const useEpisodeStore = create<EpisodeState>((set) => ({
         .from('episodes')
         .select('*')
         .in('chat_status', ['open', 'extended'])
-        .maybeSingle();
+        .order('air_start', { ascending: false })
+        .limit(1);
 
       if (error) throw error;
-      set({ currentEpisode: data, loading: false });
+      set({ currentEpisode: data?.[0] ?? null, loading: false });
     } catch (e) {
       console.error('fetchCurrentEpisode:', e);
       set({ currentEpisode: null, loading: false });

@@ -50,12 +50,16 @@ export default function ProfileScreen() {
   if (!user) {
     return (
       <View style={styles.emptyContainer}>
-        <Text style={styles.emptyText}>로그인이 필요합니다</Text>
+        <Text style={{ fontSize: 40 }}>🔐</Text>
+        <Text style={styles.emptyText}>토스 로그인 준비 중</Text>
+        <Text style={[styles.emptyText, { fontSize: fontSize.body, marginTop: 4 }]}>
+          앱인토스 연동 후 이용 가능합니다
+        </Text>
         <TouchableOpacity
-          style={styles.loginButton}
-          onPress={() => router.push('/login')}
+          style={styles.termsButton}
+          onPress={() => router.push('/terms')}
         >
-          <Text style={styles.loginButtonText}>로그인하기</Text>
+          <Text style={styles.termsButtonText}>서비스 이용약관 보기</Text>
         </TouchableOpacity>
       </View>
     );
@@ -126,6 +130,13 @@ export default function ProfileScreen() {
           ))
         )}
       </View>
+
+      <TouchableOpacity
+        style={styles.termsButton}
+        onPress={() => router.push('/terms')}
+      >
+        <Text style={styles.termsButtonText}>서비스 이용약관</Text>
+      </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.logoutButton}
@@ -267,6 +278,19 @@ const styles = StyleSheet.create({
     fontSize: fontSize.body,
     color: colors.green,
     fontWeight: fontWeight.bold,
+  },
+  termsButton: {
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: 'center',
+    marginTop: 12,
+    width: '100%',
+  },
+  termsButtonText: {
+    fontSize: fontSize.body,
+    color: colors.textSecondary,
   },
   logoutButton: {
     borderWidth: 1,

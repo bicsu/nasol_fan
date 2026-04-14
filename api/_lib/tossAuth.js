@@ -24,21 +24,23 @@ function unwrap(resData) {
   return resData.success;
 }
 
-// 토스가 RSA-OAEP 로 암호화한 개인정보 복호화
+// 토스가 AES-256-CBC 로 암호화한 개인정보 복호화
+// 키: base64 인코딩된 32바이트 AES 키
+// 암호문 형식: base64(IV[16] + ciphertext)
 function decryptField(encryptedValue) {
   if (!encryptedValue) return null;
-  const keyPem = process.env.TOSS_DECRYPT_PRIVATE_KEY;
-  if (!keyPem) {
+  const keyBase64 = process.env.TOSS_DECRYPT_PRIVATE_KEY;
+  if (!keyBase64) {
     console.warn('[tossAuth] TOSS_DECRYPT_PRIVATE_KEY 미설정 — 복호화 스킵');
     return null;
   }
   try {
-    const buffer = Buffer.from(encryptedValue, 'base64');
-    const decrypted = crypto.privateDecrypt(
-      { key: keyPem, padding: crypto.constants.RSA_PKCS1_OAEP_PADDING },
-      buffer
-    );
-    return decrypted.toString('utf8');
+    const key = Buffer.from(keyBase64, 'base64');
+    const data = Buffer.from(encryptedValue, 'base64');
+    const iv = data.slice(0, 16);
+    const ciphertext = data.slice(16);
+    const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
+    return decipher.update(ciphertext, undefined, 'utf8') + decipher.final('utf8');
   } catch (err) {
     console.error('[tossAuth] 복호화 실패:', err.message);
     return null;

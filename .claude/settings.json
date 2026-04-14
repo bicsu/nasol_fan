@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(source /Users/ken/006.PRJ/nasol_fan/.venv/bin/activate)",
+      "Bash(python3:*)",
+      "Bash(npx expo:*)",
+      "Bash(npx vercel:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(bash:*)",
+      "Bash(grep -o '[a-z]*\\\\.supabase\\\\.co' /Users/ken/006.PRJ/nasol_fan/dist/_expo/static/js/web/*.js)",
+      "Bash(curl -s https://nasolfan.vercel.app)",
+      "Bash(curl -s https://nasolfan.vercel.app/_expo/static/js/web/entry-e66d435dc320dac38a88a5873a15c6e6.js)",
+      "Bash(curl -s http://localhost:8081)",
+      "Bash(grep -E \"^\\(server|api\\)$\")",
+      "Bash(chmod +x:*)",
+      "Bash(npm install:*)",
+      "Bash(openssl rand:*)",
+      "Bash(echo -n \"nasolfans:$\\(openssl rand -hex 16\\)\")",
+      "Bash(tee /tmp/basic_auth_raw.txt)",
+      "Read(//tmp/**)",
+      "Bash(curl:*)"
+    ]
+  }
+}

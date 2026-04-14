@@ -56,6 +56,4 @@ tmp/
 .vercel
 
 server/certs/*
-
-
-.venv
+.venv/

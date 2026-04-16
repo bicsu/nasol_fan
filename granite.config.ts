@@ -1,5 +1,7 @@
+import '@apps-in-toss/web-framework';
+
 export default {
-  appName: 'nasolFans',
+  appName: 'nasol-fans',
   outdir: './dist',
   brand: {
     displayName: '나솔팬즈',
@@ -8,7 +10,7 @@ export default {
   },
   permissions: [],
   webViewProps: {
-    type: 'partner',
+    type: 'partner' as const,
   },
   web: {
     commands: {

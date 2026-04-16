@@ -27,7 +27,11 @@ function readBody(req) {
   return {};
 }
 
+const { applyCors } = require('../_lib/cors');
+
 module.exports = async function handler(req, res) {
+  if (applyCors(req, res)) return;
+
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
     return res.status(405).json({ error: 'method_not_allowed' });

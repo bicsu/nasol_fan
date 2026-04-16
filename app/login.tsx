@@ -44,7 +44,8 @@ export default function LoginScreen() {
       const { authorizationCode, referrer } = await appLogin();
 
       // 2) 자체 백엔드로 인가코드 전달 → 토스 API 토큰 교환 + Supabase 세션 발급
-      const res = await fetch(`/api/auth/token`, {
+      const apiBase = process.env.EXPO_PUBLIC_API_URL || 'https://nasolfan.vercel.app';
+      const res = await fetch(`${apiBase}/api/auth/token`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ authorizationCode, referrer }),

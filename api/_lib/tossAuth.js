@@ -48,22 +48,40 @@ function decryptField(encryptedValue) {
 }
 
 // 암호화된 필드가 포함된 유저 정보를 복호화하여 반환
+// 토스 인증 문서 응답 필드: userKey, name, email, gender, birthday
+// 레거시 필드: tossUserKey, user_name, user_email, user_gender, user_birthday
+// 두 형식 모두 처리하여 통일된 필드명으로 반환
 function decryptUserInfo(info) {
+  const rawName = info.name || info.user_name;
+  const rawEmail = info.email || info.user_email;
+  const rawGender = info.gender || info.user_gender;
+  const rawBirthday = info.birthday || info.user_birthday;
+
   return {
     ...info,
-    user_name: decryptField(info.user_name) || info.user_name,
-    user_email: decryptField(info.user_email) || info.user_email,
-    user_gender: decryptField(info.user_gender) || info.user_gender,
-    user_birthday: decryptField(info.user_birthday) || info.user_birthday,
+    // 토스 문서 표준 필드명으로 통일
+    userKey: info.userKey || info.tossUserKey,
+    name: decryptField(rawName) || rawName,
+    email: decryptField(rawEmail) || rawEmail,
+    gender: decryptField(rawGender) || rawGender,
+    birthday: decryptField(rawBirthday) || rawBirthday,
+    // 하위 호환: 기존 코드가 참조하는 레거시 필드도 유지
+    tossUserKey: info.userKey || info.tossUserKey,
+    user_name: decryptField(rawName) || rawName,
+    user_email: decryptField(rawEmail) || rawEmail,
+    user_gender: decryptField(rawGender) || rawGender,
+    user_birthday: decryptField(rawBirthday) || rawBirthday,
   };
 }
 
 async function exchangeCodeForToken(code) {
+  const redirectUri = process.env.TOSS_REDIRECT_URI || 'https://nasolfan.vercel.app';
   const body = new URLSearchParams({
     grant_type: 'authorization_code',
     code,
     client_id: CLIENT_ID(),
     client_secret: CLIENT_SECRET(),
+    redirect_uri: redirectUri,
   });
   const res = await tossApi.post(TOKEN_PATH, body.toString(), {
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },

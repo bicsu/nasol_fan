@@ -57,14 +57,14 @@ module.exports = async function handler(req, res) {
 
     // 2) 토스 유저 정보 조회 (이미 success 페이로드가 반환됨)
     const info = (await fetchTossUserInfo(accessToken)) || {};
-    const tossUserKey = info.tossUserKey;
+    const tossUserKey = info.userKey || info.tossUserKey;
     if (!tossUserKey) {
       return res.status(502).json({ error: 'toss_user_key_missing' });
     }
-    const realName = info.user_name || null;
-    const realEmail = info.user_email || null;
-    const gender = info.user_gender || null;
-    const birthday = info.user_birthday || null;
+    const realName = info.name || info.user_name || null;
+    const realEmail = info.email || info.user_email || null;
+    const gender = info.gender || info.user_gender || null;
+    const birthday = info.birthday || info.user_birthday || null;
     // 닉네임: 이름 있으면 사용, 없으면 팬_XXXXXX
     const nickname = realName || `팬_${String(tossUserKey).slice(-6)}`;
     const avatarColor = '#D4537E';

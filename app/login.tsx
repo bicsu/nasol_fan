@@ -13,9 +13,6 @@ import { colors, fontSize, fontWeight } from '../lib/theme';
 import { supabase } from '../lib/supabase';
 import { useAuthStore } from '../stores/authStore';
 
-const BACKEND_URL =
-  process.env.EXPO_PUBLIC_BACKEND_URL || 'https://api.nasolfans.app';
-
 // 앱인토스 미니앱 환경 여부 체크
 function isAppInTossEnv(): boolean {
   if (typeof window === 'undefined') return false;
@@ -47,7 +44,7 @@ export default function LoginScreen() {
       const { authorizationCode, referrer } = await appLogin();
 
       // 2) 자체 백엔드로 인가코드 전달 → 토스 API 토큰 교환 + Supabase 세션 발급
-      const res = await fetch(`${BACKEND_URL}/api/auth/toss/token`, {
+      const res = await fetch(`/api/auth/token`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ authorizationCode, referrer }),

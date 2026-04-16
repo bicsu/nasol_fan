@@ -15,6 +15,7 @@ export default {
   web: {
     commands: {
       build: 'expo export -p web --clear && bash scripts/patch-dist.sh',
+      dev: 'expo start --web --port 3000',
     },
   },
 };

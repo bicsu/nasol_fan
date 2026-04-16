@@ -75,6 +75,16 @@ html = html.replace('src="/', 'src="')
 with open(html_path, 'w', encoding='utf-8') as f:
     f.write(html)
 
+# 6. JS 번들 내 절대경로 → 상대경로 변환
+import glob, os
+for js_file in glob.glob(os.path.join(dist_dir, '_expo', 'static', 'js', 'web', '*.js')):
+    with open(js_file, 'r', encoding='utf-8') as f:
+        js = f.read()
+    # "/assets/ → "assets/  (에셋 경로)
+    js = js.replace('"/assets/', '"assets/')
+    with open(js_file, 'w', encoding='utf-8') as f:
+        f.write(js)
+
 # 5. manifest.json
 manifest = {
     "name": "나솔팬즈",

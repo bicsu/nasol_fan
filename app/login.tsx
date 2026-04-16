@@ -8,7 +8,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { appLogin } from '@apps-in-toss/web-framework';
+import { appLogin, closeView } from '@apps-in-toss/web-framework';
 import { colors, fontSize, fontWeight } from '../lib/theme';
 import { supabase } from '../lib/supabase';
 import { useAuthStore } from '../stores/authStore';
@@ -123,6 +123,17 @@ export default function LoginScreen() {
             <Text style={styles.linkText}>서비스 이용약관</Text>
           </TouchableOpacity>
         </View>
+
+        <TouchableOpacity
+          style={styles.closeButton}
+          onPress={() => {
+            if (isAppInTossEnv()) {
+              closeView();
+            }
+          }}
+        >
+          <Text style={styles.closeButtonText}>닫기</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -202,6 +213,14 @@ const styles = StyleSheet.create({
   },
   linkDivider: {
     fontSize: fontSize.meta,
+    color: colors.textSecondary,
+  },
+  closeButton: {
+    marginTop: 16,
+    alignItems: 'center' as const,
+  },
+  closeButtonText: {
+    fontSize: fontSize.body,
     color: colors.textSecondary,
   },
 });

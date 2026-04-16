@@ -12,25 +12,16 @@ function TabIcon({ label, color }: { label: string; color: string }) {
 export default function TabLayout() {
   const router = useRouter();
   const session = useAuthStore((s) => s.session);
-  const user = useAuthStore((s) => s.user);
   const loading = useAuthStore((s) => s.loading);
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
     if (loading) return;
 
-    // 세션 없음 → 로그인으로
-    // (임시 닉네임 로그인: session 없이 user만 있을 수 있으므로 user도 허용)
-    if (!session?.user?.id && !user?.id) {
-      router.replace('/login');
-      return;
-    }
-
-    // consent 검증 (실제 Supabase 세션이 있을 때만 체크 — RLS 대상)
+    // 세션 없음 → 로그인으로 (토스 로그인만 허용)
     const userId = session?.user?.id;
     if (!userId) {
-      // 임시 닉네임 로그인 경로: consent 체크 스킵 (Phase 2에서 제거 예정)
-      setChecking(false);
+      router.replace('/login');
       return;
     }
 
@@ -71,7 +62,7 @@ export default function TabLayout() {
     return () => {
       cancelled = true;
     };
-  }, [loading, session, user, router]);
+  }, [loading, session, router]);
 
   if (loading || checking) {
     return (
@@ -95,8 +86,19 @@ export default function TabLayout() {
         tabBarInactiveTintColor: colors.textSecondary,
         tabBarStyle: {
           backgroundColor: colors.white,
-          borderTopColor: colors.border,
-          ...(Platform.OS === 'web' ? { paddingBottom: 20 } : {}),
+          borderTopColor: 'transparent',
+          position: 'absolute' as const,
+          bottom: 16,
+          left: 16,
+          right: 16,
+          borderRadius: 24,
+          height: 60,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.1,
+          shadowRadius: 12,
+          elevation: 8,
+          ...(Platform.OS === 'web' ? { paddingBottom: 0 } : {}),
         },
         tabBarLabelStyle: {
           fontSize: fontSize.meta,

@@ -49,6 +49,10 @@ export default function RootLayout() {
           options={{ title: '서비스 이용약관' }}
         />
         <Stack.Screen
+          name="privacy"
+          options={{ title: '개인정보처리방침' }}
+        />
+        <Stack.Screen
           name="consent"
           options={{
             title: '약관 동의',

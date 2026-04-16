@@ -55,7 +55,20 @@ meta_tags = """
 
 html = html.replace('</head>', meta_tags + '\n</head>')
 
-# 4. 절대경로 → 상대경로 (토스 미니앱 WebView 호환)
+# 4. 에러 로깅 스크립트 삽입 (토스 미니앱 디버깅용)
+error_script = """
+  <script>
+    (function(){
+      var API='https://nasolfan.vercel.app/api/log/error';
+      function send(d){try{navigator.sendBeacon?navigator.sendBeacon(API,JSON.stringify(d)):fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)})}catch(e){}}
+      window.onerror=function(m,s,l,c,e){send({type:'onerror',message:m,source:s,line:l,col:c,stack:e&&e.stack});};
+      window.onunhandledrejection=function(ev){send({type:'unhandledrejection',reason:String(ev.reason),stack:ev.reason&&ev.reason.stack});};
+      send({type:'init',ua:navigator.userAgent,url:location.href,time:new Date().toISOString()});
+    })();
+  </script>"""
+html = html.replace('<div id="root">', error_script + '\n    <div id="root">')
+
+# 5. 절대경로 → 상대경로 (토스 미니앱 WebView 호환)
 html = html.replace('href="/', 'href="')
 html = html.replace('src="/', 'src="')
 

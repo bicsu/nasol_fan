@@ -55,10 +55,14 @@ meta_tags = """
 
 html = html.replace('</head>', meta_tags + '\n</head>')
 
+# 4. 절대경로 → 상대경로 (토스 미니앱 WebView 호환)
+html = html.replace('href="/', 'href="')
+html = html.replace('src="/', 'src="')
+
 with open(html_path, 'w', encoding='utf-8') as f:
     f.write(html)
 
-# 4. manifest.json
+# 5. manifest.json
 manifest = {
     "name": "나솔팬즈",
     "short_name": "나솔팬즈",

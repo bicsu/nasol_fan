@@ -8,10 +8,11 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "build": "expo export -p web --clear && bash scripts/patch-dist.sh",
+    "build:minimal": "bash scripts/minimal-build.sh",
     "deploy": "bash scripts/deploy.sh"
   },
   "dependencies": {
-    "@apps-in-toss/web-framework": "^1.14.1",
+    "@apps-in-toss/web-framework": "^2.0.0",
     "@expo/ngrok": "^4.1.3",
     "@expo/vector-icons": "^15.0.3",
     "@supabase/supabase-js": "^2.49.1",

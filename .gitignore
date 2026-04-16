@@ -57,3 +57,6 @@ tmp/
 
 server/certs/*
 .venv/
+*.ait
+.granite/
+docs/app_in_toss/토스 로그인 API _ 토스 인증.html

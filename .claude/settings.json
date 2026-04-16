@@ -21,5 +21,19 @@
       "Read(//tmp/**)",
       "Bash(curl:*)"
     ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "INPUT=$(cat); FILE=$(echo \"$INPUT\" | jq -r '.tool_input.file_path // \"\"'); TODAY=$(date +%Y%m%d); if echo \"$FILE\" | grep -qE '^(api|app|supabase|scripts)/'; then echo \"{\\\"hookSpecificOutput\\\":{\\\"hookEventName\\\":\\\"PostToolUse\\\",\\\"additionalContext\\\":\\\"[todo-hook] 코드 수정: $FILE — docs/todo/${TODAY}.md 의 관련 항목을 체크하거나 추가하세요.\\\"}}\"; elif echo \"$FILE\" | grep -qE '^docs/' && ! echo \"$FILE\" | grep -qE '^docs/todo/'; then echo \"{\\\"hookSpecificOutput\\\":{\\\"hookEventName\\\":\\\"PostToolUse\\\",\\\"additionalContext\\\":\\\"[todo-hook] 문서 변경: $FILE — 새 계획/태스크가 있으면 docs/todo/${TODAY}.md 에 반영하세요.\\\"}}\"; fi",
+            "statusMessage": "todo 업데이트 확인 중..."
+          }
+        ]
+      }
+    ]
   }
 }

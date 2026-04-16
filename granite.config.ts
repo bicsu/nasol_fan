@@ -14,7 +14,7 @@ export default {
   },
   web: {
     commands: {
-      build: 'expo export -p web --clear',
+      build: 'expo export -p web --clear && bash scripts/patch-dist.sh',
     },
   },
 };
